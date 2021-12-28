@@ -1,0 +1,26 @@
+[package]
+name = "casbinerr"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "3"
+dotenv = "0.15"
+anyhow = "1.0"
+# from v2.0.6 on casbin only supports tokio 1.0 which conflicts with actix-web 3,
+# see https://github.com/casbin/casbin-rs#installation and
+# https://github.com/actix/examples/blob/516faf22dbd0d3a8cb0aa85ca3acd331cb407882/Cargo.lock
+casbin = "=2.0.5"
+# these rhai deps are needed for casbin v2.0.5
+rhai = "=0.19.14"
+rhai_codegen = "=0.3.3"
+# have to use casbin's sqlx-adapter v0.3.0 as this is the last version that works with
+# casbin v2.0.5. default features are 'false' because that would pull in an async runtime
+# whose version conflicts with what sqlx v0.4 uses. oh my dependency hell. the good thing is,
+# sqlx-adapter uses the async runtime for tests only.
+sqlx-adapter = { version = "0.3.0", default-features = false, features = ["postgres", "offline"] }
+# using sqlx v0.4 here since 0.5 depends on tokio 1.0 which conflicts with actix-web 3,
+# see https://www.reddit.com/r/rust/comments/mqts17/comment/guidb8h/
+sqlx = { version = "0.4", features = ["runtime-actix-rustls", "chrono", "postgres"] }
